@@ -14,7 +14,7 @@ export const getExamPerformance = (req: Request, res: Response) => {
 
 export const saveExamResult = (req: Request, res: Response) => {
   try {
-    const { questionId, isCorrect } = req.body as ExamResultRequest;
+    const { questionId, isCorrect } = (req.body ?? {}) as ExamResultRequest;
 
     if (questionId === undefined || isCorrect === undefined) {
       return res.status(400).json({ success: false, error: 'questionId and isCorrect are required' });
@@ -50,7 +50,7 @@ export const resetExamData = (req: Request, res: Response) => {
   }
 };
 
-export const getQuestionStats = (req: Request, res: Response) => {
+export const getQuestionStats = (req: Request<{ questionId: string }>, res: Response) => {
   try {
     const { questionId } = req.params;
     const id = parseInt(questionId);

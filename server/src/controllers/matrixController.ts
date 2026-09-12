@@ -14,7 +14,7 @@ import { MatrixOperationRequest } from '../types/index.js';
 
 export const addMatricesController = (req: Request, res: Response) => {
   try {
-    const { matrixA, matrixB } = req.body as MatrixOperationRequest;
+    const { matrixA, matrixB } = (req.body ?? {}) as MatrixOperationRequest;
 
     if (!matrixA || !matrixB) {
       return res.status(400).json({ success: false, error: 'Both matrices are required' });
@@ -34,7 +34,7 @@ export const addMatricesController = (req: Request, res: Response) => {
 
 export const subtractMatricesController = (req: Request, res: Response) => {
   try {
-    const { matrixA, matrixB } = req.body as MatrixOperationRequest;
+    const { matrixA, matrixB } = (req.body ?? {}) as MatrixOperationRequest;
 
     if (!matrixA || !matrixB) {
       return res.status(400).json({ success: false, error: 'Both matrices are required' });
@@ -54,7 +54,7 @@ export const subtractMatricesController = (req: Request, res: Response) => {
 
 export const multiplyMatricesController = (req: Request, res: Response) => {
   try {
-    const { matrixA, matrixB } = req.body as MatrixOperationRequest;
+    const { matrixA, matrixB } = (req.body ?? {}) as MatrixOperationRequest;
 
     if (!matrixA || !matrixB) {
       return res.status(400).json({ success: false, error: 'Both matrices are required' });
@@ -74,7 +74,7 @@ export const multiplyMatricesController = (req: Request, res: Response) => {
 
 export const scalarMultiplyController = (req: Request, res: Response) => {
   try {
-    const { matrixA, scalar } = req.body as MatrixOperationRequest;
+    const { matrixA, scalar } = (req.body ?? {}) as MatrixOperationRequest;
 
     if (!matrixA || scalar === undefined) {
       return res.status(400).json({ success: false, error: 'Matrix and scalar are required' });
@@ -89,7 +89,7 @@ export const scalarMultiplyController = (req: Request, res: Response) => {
 
 export const transposeController = (req: Request, res: Response) => {
   try {
-    const { matrixA } = req.body as MatrixOperationRequest;
+    const { matrixA } = (req.body ?? {}) as MatrixOperationRequest;
 
     if (!matrixA) {
       return res.status(400).json({ success: false, error: 'Matrix is required' });
@@ -104,7 +104,7 @@ export const transposeController = (req: Request, res: Response) => {
 
 export const determinantController = (req: Request, res: Response) => {
   try {
-    const { matrixA } = req.body as MatrixOperationRequest;
+    const { matrixA } = (req.body ?? {}) as MatrixOperationRequest;
 
     if (!matrixA) {
       return res.status(400).json({ success: false, error: 'Matrix is required' });
@@ -124,7 +124,7 @@ export const determinantController = (req: Request, res: Response) => {
 
 export const inverseController = (req: Request, res: Response) => {
   try {
-    const { matrixA } = req.body as MatrixOperationRequest;
+    const { matrixA } = (req.body ?? {}) as MatrixOperationRequest;
 
     if (!matrixA) {
       return res.status(400).json({ success: false, error: 'Matrix is required' });
@@ -144,7 +144,7 @@ export const inverseController = (req: Request, res: Response) => {
 
 export const traceController = (req: Request, res: Response) => {
   try {
-    const { matrixA } = req.body as MatrixOperationRequest;
+    const { matrixA } = (req.body ?? {}) as MatrixOperationRequest;
 
     if (!matrixA) {
       return res.status(400).json({ success: false, error: 'Matrix is required' });
@@ -164,7 +164,7 @@ export const traceController = (req: Request, res: Response) => {
 
 export const eigenvaluesController = (req: Request, res: Response) => {
   try {
-    const { matrixA } = req.body as MatrixOperationRequest;
+    const { matrixA } = (req.body ?? {}) as MatrixOperationRequest;
 
     if (!matrixA) {
       return res.status(400).json({ success: false, error: 'Matrix is required' });
