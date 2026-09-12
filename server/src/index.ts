@@ -70,7 +70,12 @@ app.use((err: Error, req: Request, res: Response, next: express.NextFunction) =>
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, (error?: Error) => {
+  if (error) {
+    console.error(`Failed to start Inmerson Lab API on port ${PORT}:`, error.message);
+    process.exit(1);
+  }
+
   console.log(`✅ Inmerson Lab API server running on port ${PORT}`);
   console.log(`📊 Health check available at http://localhost:${PORT}/health`);
   console.log(`📚 API documentation at http://localhost:${PORT}/`);

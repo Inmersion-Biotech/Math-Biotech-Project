@@ -6,8 +6,10 @@
  */
 
 const API_BASE_URL = process.env.API_URL || 'http://localhost:5000';
+let passed = 0;
+let failed = 0;
 
-async function testEndpoint(name, method, path, body = null) {
+async function testEndpoint(name, method, path, body = null, expectedStatus = 200) {
   console.log(`\n🧪 Testing: ${name}`);
   console.log(`   ${method} ${path}`);
   
@@ -24,14 +26,18 @@ async function testEndpoint(name, method, path, body = null) {
     const response = await fetch(`${API_BASE_URL}${path}`, options);
     const data = await response.json();
     
-    if (response.ok) {
+    if (response.status === expectedStatus) {
+      passed++;
       console.log(`   ✅ Success:`, JSON.stringify(data, null, 2));
     } else {
+      failed++;
       console.log(`   ❌ Failed:`, JSON.stringify(data, null, 2));
+      console.log(`   Expected HTTP ${expectedStatus}, received ${response.status}`);
     }
     
     return data;
   } catch (error) {
+    failed++;
     console.log(`   ❌ Error:`, error.message);
     return null;
   }
@@ -43,6 +49,8 @@ async function runTests() {
   
   // Health check
   await testEndpoint('Health Check', 'GET', '/health');
+
+  await testEndpoint('Root Endpoint', 'GET', '/');
   
   // Matrix operations
   await testEndpoint(
@@ -52,6 +60,24 @@ async function runTests() {
     {
       matrixA: [[1, 2], [3, 4]],
       matrixB: [[5, 6], [7, 8]]
+    }
+  );
+
+  await testEndpoint(
+    'Matrix Addition Rejects Missing Body',
+    'POST',
+    '/api/matrix/add',
+    null,
+    400
+  );
+
+  await testEndpoint(
+    'Matrix Subtraction',
+    'POST',
+    '/api/matrix/subtract',
+    {
+      matrixA: [[5, 6], [7, 8]],
+      matrixB: [[1, 2], [3, 4]]
     }
   );
   
@@ -110,6 +136,15 @@ async function runTests() {
       matrixA: [[1, 2, 3], [4, 5, 6]]
     }
   );
+
+  await testEndpoint(
+    'Matrix Trace',
+    'POST',
+    '/api/matrix/trace',
+    {
+      matrixA: [[1, 2], [3, 4]]
+    }
+  );
   
   // Exam endpoints
   await testEndpoint(
@@ -120,6 +155,14 @@ async function runTests() {
       questionId: 1,
       isCorrect: true
     }
+  );
+
+  await testEndpoint(
+    'Save Exam Result Rejects Missing Body',
+    'POST',
+    '/api/exam/result',
+    null,
+    400
   );
   
   await testEndpoint(
@@ -143,9 +186,19 @@ async function runTests() {
     'GET',
     '/api/exam/question/1'
   );
+
+  await testEndpoint('Reset Exam Data', 'DELETE', '/api/exam/reset');
+
+  await testEndpoint('Unknown Endpoint', 'GET', '/does-not-exist', null, 404);
   
-  console.log('\n\n✨ Test suite completed!');
+  console.log(`\n\n✨ Test suite completed: ${passed} passed, ${failed} failed`);
+  if (failed > 0) {
+    process.exitCode = 1;
+  }
 }
 
 // Run tests
-runTests().catch(console.error);
+runTests().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
