@@ -50,7 +50,7 @@ export const resetExamData = (req: Request, res: Response) => {
   }
 };
 
-export const getQuestionStats = (req: Request, res: Response) => {
+export const getQuestionStats = (req: Request<{ questionId: string }>, res: Response) => {
   try {
     const { questionId } = req.params;
     const id = parseInt(questionId);
