@@ -1,4 +1,4 @@
-name: Publish GitHub Pages site
+name: Deploy GitHub Pages site
 
 on:
   push:
@@ -6,15 +6,21 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: github-pages-source
+  group: github-pages
   cancel-in-progress: true
 
 jobs:
-  publish:
-    name: Verify and publish static site
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    name: Verify and deploy static site
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
 
     steps:
@@ -27,30 +33,20 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Configure Pages
+        uses: actions/configure-pages@v6
+
       - name: Install dependencies
         run: npm ci --include=optional
 
       - name: Verify application
         run: npm run verify
 
-      - name: Build GitHub Pages site
-        run: npm run build:pages
-
-      - name: Upload generated site artifact
-        uses: actions/upload-artifact@v6
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v5
         with:
-          name: math-biotech-pages-site
-          path: site
-          if-no-files-found: error
+          path: dist
 
-      - name: Commit generated site to main
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A site
-          if git diff --cached --quiet; then
-            echo "Generated site is already current."
-          else
-            git commit -m "chore: publish GitHub Pages site [skip ci]"
-            git push origin HEAD:main
-          fi
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
